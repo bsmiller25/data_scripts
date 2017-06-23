@@ -21,7 +21,7 @@ engine = sql.create_engine('postgresql:///nyc')
 # import each file
 print('Loading Citi Bike Data to python')
 trips = pd.DataFrame()
-for f in glob.glob(wd[:-1]+'/data_scripts/data/citibike*'):
+for f in glob.glob(wd[:-1]+'./data_scripts/data/citibike*'):
     print('Loading: ' + f)
     print(str(datetime.datetime.now()))
     new_month = pd.read_csv(f)

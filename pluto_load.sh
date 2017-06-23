@@ -12,13 +12,13 @@ do
     unzip -o -d $b'pluto/' $b'pluto.zip'
 
     # if table exists, drop it
-    if sudo -u postgres psql cpdb -t -A -c 'SELECT * FROM pg_catalog.pg_tables' | grep -qw $b'mappluto'; then
-        sudo -u postgres psql cpdb -q -c 'DROP TABLE $bmappluto'
+    if psql nyc -t -A -c 'SELECT * FROM pg_catalog.pg_tables' | grep -qw $b'mappluto'; then
+        psql nyc -q -c 'DROP TABLE '$b'mappluto'
     fi
 
     # write new table to psql
     echo 'writing '$b' to sql -- this takes a minute'
-    shp2pgsql $b'pluto/'${b^^}'MapPLUTO.shp' | psql -q -d nyc
+    shp2pgsql $b'pluto/'${b^^}'MapPLUTO.shp' | psql -q -d nyc 
 
     # clean up
     echo 'cleaning up '$b
