@@ -27,7 +27,7 @@ python $DIR/python/citibike_load.py
 
 # update permissions and geometries
 echo 'Updating permissions and geometries for Citi Bike tables'
-psql nyc -f $DIR/sql/ciibike_load.sql
+psql nyc -f $DIR/sql/citibike_load.sql
 
 # clean up
 rm $DIR/data/citibike*
