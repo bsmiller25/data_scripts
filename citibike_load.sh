@@ -30,7 +30,7 @@ echo 'Updating permissions and geometries for Citi Bike tables'
 psql nyc -f $DIR/sql/citibike_load.sql
 
 # clean up
-#rm $DIR/data/citibike*
+rm $DIR/data/citibike*
 
 # done
 echo 'Citi Bike data loaded to psql'
