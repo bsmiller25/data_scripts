@@ -16,11 +16,11 @@ wd = subprocess.check_output('git rev-parse --show-toplevel', shell=True)
 os.chdir(wd[:-1])  # -1 removes \n
 
 # sql connection
-engine = sql.create_engine('postgresql:///nyc')
+engine = sql.create_engine('postgresql://localhost:5432/nyc')
 
-# import each file
+stations = pd.DataFrame()
+# import each file and push each file
 print('Loading Citi Bike Data to python')
-trips = pd.DataFrame()
 for f in glob.glob(wd[:-1].decode("utf-8")+'/data/citibike*'):
     print('Loading: ' + f)
     print(str(datetime.datetime.now()))
@@ -43,26 +43,16 @@ for f in glob.glob(wd[:-1].decode("utf-8")+'/data/citibike*'):
             new_month['stoptime'] = pd.to_datetime(new_month['stoptime'])
         except:
             raise ValueError('Weird datetime')
-    trips = pd.concat((trips, new_month))
-
-# find unique stations for stations table
-print('Making citibike stations table')
-stations = trips[['startstationid',
-                  'startstationname',
-                  'startstationlatitude',
-                  'startstationlongitude']].drop_duplicates()
-stations.columns = ['id', 'name', 'lat', 'lon']
-
-# clean up trips data
-trips = trips[['starttime',
-               'stoptime',
-               'startstationid',
-               'endstationid',
-               'tripduration',
-               'usertype',
-               'birthyear',
-               'gender',
-               'bikeid']]
+    new_month.to_sql('citibike_trips',
+                     con=engine,
+                     if_exists='append',
+                     index=False)
+    new_stations = new_month[['startstationid',
+                              'startstationname',
+                              'startstationlatitude',
+                              'startstationlongitude']].drop_duplicates()
+    new_stations.columns = ['id', 'name', 'lat', 'lon']
+    stations = pd.concat((stations, new_stations)).drop_duplicates()
 
 # write stations table to psql
 print('Writing citibike stations table to psql')
@@ -71,12 +61,3 @@ stations.to_sql('citibike_stations',
                 if_exists='replace',
                 index=False)
 
-
-print('Writing citibike trips to sql')
-print(str(datetime.datetime.now()))
-trips.to_sql('citibike_trips',
-             con=engine,
-             if_exists='replace',
-             index=False)
-print('Done!')
-print(str(datetime.datetime.now()))

@@ -22,6 +22,12 @@ do
   rm $DIR/data/citibike_20170$m.zip
 done
 
+# if trips table exists, drop it
+if psql nyc -t -A -c 'SELECT * FROM pg_catalog.pg_tables' | grep -qw citibike_trips; then
+    psql nyc -c 'DROP table citibike_trips;'
+fi
+
+
 # push the Citi Bike Data to psql
 python $DIR/python/citibike_load.py
 
